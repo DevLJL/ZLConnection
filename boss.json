@@ -1,9 +1,0 @@
-{
-	"name": "ZLConnection",
-	"description": "",
-	"version": "3.1.0",
-	"homepage": "",
-	"mainsrc": "./src",
-	"projects": [],
-	"dependencies": {}
-}
