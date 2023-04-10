@@ -51,6 +51,7 @@ type
     function AutoCalcFields: Boolean; overload;
     function AutoCalcFields(AValue: Boolean): IZLMemTable; overload;
     function CloneCursor(ASource: TDataSet; AReset: Boolean = False; AKeepSettings: Boolean = False): IZLMemTable;
+    function FindField(AValue: String): TField;
   end;
 
 implementation
@@ -272,6 +273,11 @@ end;
 function TZLMemTableFireDAC.FieldDefs: TFieldDefs;
 begin
   Result := FMemTable.FieldDefs;
+end;
+
+function TZLMemTableFireDAC.FindField(AValue: String): TField;
+begin
+  Result := FMemTable.FindField(AValue);
 end;
 
 function TZLMemTableFireDAC.First: IZLMemTable;

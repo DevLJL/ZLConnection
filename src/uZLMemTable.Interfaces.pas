@@ -44,6 +44,7 @@ type
     function AutoCalcFields: Boolean; overload;
     function AutoCalcFields(AValue: Boolean): IZLMemTable; overload;
     function CloneCursor(ASource: TDataSet; AReset: Boolean = False; AKeepSettings: Boolean = False): IZLMemTable;
+    function FindField(AValue: String): TField;
   end;
 
 
