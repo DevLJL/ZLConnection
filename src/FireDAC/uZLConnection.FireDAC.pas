@@ -14,7 +14,8 @@ uses
   uZLScript.Interfaces,
   uZLConnection.Types,
   System.Generics.Collections,
-  uZLMigration;
+  uZLMigration,
+  uZLSeeder;
 
 type
   TZLConnectionFireDAC = class(TInterfacedObject, IZLConnection)
@@ -30,6 +31,7 @@ type
     FDriverID,
     FVendorLib: String;
     FMigrations: TObjectList<TZLMigration>;
+    FSeeders: TObjectList<TZLSeeder>;
     constructor Create(ADatabase, AServer, AUserName, APassword, ADriverID, AVendorLib: String);
     function SetUp: IZLConnection;
   public
@@ -54,6 +56,10 @@ type
     function MigrationsHasBeenPerformed: IZLQry;
     function RunPendingMigrations: IZLConnection;
     function NextUUID: String;
+    function CreateSeederTableIfNotExists: IZLConnection;
+    function AddSeeder(const ADescription, AScript: String): IZLConnection;
+    function SeedersHasBeenPerformed: IZLQry;
+    function RunPendingSeeders: IZLConnection;
   end;
 
 implementation
@@ -70,6 +76,12 @@ function TZLConnectionFireDAC.AddMigration(const ADescription, AScript: String):
 begin
   Result := Self;
   FMigrations.Add(TZLMigration.Make(ADescription, AScript));
+end;
+
+function TZLConnectionFireDAC.AddSeeder(const ADescription, AScript: String): IZLConnection;
+begin
+  Result := Self;
+  FSeeders.Add(TZLSeeder.Make(ADescription, AScript));
 end;
 
 function TZLConnectionFireDAC.CommitTransaction: IZLConnection;
@@ -103,6 +115,7 @@ begin
   FDriverID        := ADriverID;
   FVendorLib       := AVendorLib;
   FMigrations      := TObjectList<TZLMigration>.Create;
+  FSeeders         := TObjectList<TZLSeeder>.Create;
   SetUp;
 end;
 
@@ -131,6 +144,31 @@ begin
   end;
 end;
 
+function TZLConnectionFireDAC.CreateSeederTableIfNotExists: IZLConnection;
+const
+  SELECT_SEEDER_MYSQL = 'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = %s AND table_name = %s';
+  CREATE_SEEDER_MYSQL = ' CREATE TABLE `seeder` (                               '+
+                           '   `id` bigint NOT NULL AUTO_INCREMENT,             '+
+                           '   `description` varchar(255) NOT NULL,             '+
+                           '   `executed_at` datetime DEFAULT NULL,             '+
+                           '   `duration` decimal(18,4) DEFAULT NULL,           '+
+                           '   `batch` varchar(36) DEFAULT NULL,                '+
+                           '   PRIMARY KEY (`id`),                              '+
+                           '   KEY `seeder_idx_description` (`description`),    '+
+                           '   KEY `seeder_idx_batch` (`batch`)                 '+
+                           ' )                                                  ';
+var
+  lQry: IZLQry;
+begin
+  // Criar Seeder para o MySQL ###Precisa refatorar###
+  if (FDriverDB = TZLDriverDB.ddMySql) then
+  begin
+    lQry := MakeQry.Open(Format(SELECT_SEEDER_MYSQL, [QuotedStr(FDatabase), QuotedStr('seeder')]));
+    if (lQry.DataSet.Fields[0].AsInteger <= 0) then
+      lQry.ExecSQL(CREATE_SEEDER_MYSQL);
+  end;
+end;
+
 function TZLConnectionFireDAC.DataBaseName: String;
 begin
   Result := FConn.Params.Database;
@@ -141,6 +179,7 @@ begin
   if Assigned(FConn)            then FreeAndNil(FConn);
   if Assigned(FMySQLDriverLink) then FreeAndNil(FMySQLDriverLink);
   if Assigned(FMigrations)      then FreeAndNil(FMigrations);
+  if Assigned(FSeeders)         then FreeAndNil(FSeeders);
 
   inherited;
 end;
@@ -263,6 +302,68 @@ begin
       raise;
     end;
   end;
+end;
+
+function TZLConnectionFireDAC.RunPendingSeeders: IZLConnection;
+const
+  L_INSERT_SEEDER = ' INSERT INTO seeder                               '+
+                       '   (description, duration, batch, executed_at) '+
+                       ' VALUES                                        '+
+                       '   (%s, %s, %s, %s)                            ';
+var
+  lPendingSeedersQry, lQrySeeder: IZLQry;
+  lScript: IZLScript;
+  lSeeder: TZLSeeder;
+  lStartTime: Cardinal;
+  lDuration: Double;
+  lBatch: String;
+begin
+  Result := Self;
+
+  CreateSeederTableIfNotExists;
+  lPendingSeedersQry    := Self.SeedersHasBeenPerformed;
+  lQrySeeder            := Self.MakeQry;
+  lScript               := Self.MakeScript;
+  lBatch                := Self.NextUUID;
+
+  for lSeeder in FSeeders do
+  begin
+    if lPendingSeedersQry.First.Locate('description', lSeeder.Description) then
+      Continue;
+
+    try
+      lStartTime := GetTickCount;
+      Self.StartTransaction;
+      lScript
+        .SQLScriptsClear
+        .SQLScriptsAdd(lSeeder.Script)
+        .ValidateAll;
+      if not lScript.ExecuteAll then
+        raise Exception.Create('Error validation in seeder: ' + lSeeder.Description);
+
+      // Registrar Seeder
+      lDuration := (GetTickCount - lStartTime)/1000;
+      lQrySeeder.ExecSQL(Format(L_INSERT_SEEDER, [
+        QuotedStr(lSeeder.Description),
+        QuotedStr(StringReplace(FormatFloat('0.0000', lDuration), FormatSettings.DecimalSeparator, '.', [rfReplaceAll,rfIgnoreCase])),
+        QuotedStr(lBatch),
+        QuotedStr(FormatDateTime('YYYY-MM-DD HH:MM:SS', now))
+      ]));
+
+      // Commit
+      Self.CommitTransaction;
+    Except
+      Self.RollBackTransaction;
+      raise;
+    end;
+  end;
+end;
+
+function TZLConnectionFireDAC.SeedersHasBeenPerformed: IZLQry;
+const
+  SEEDER_ORDER_BY_DESCRIPTION = 'select * from seeder order by id';
+begin
+  Result := MakeQry.Open(SEEDER_ORDER_BY_DESCRIPTION);
 end;
 
 function TZLConnectionFireDAC.SetUp: IZLConnection;

@@ -29,6 +29,10 @@ type
     function AddMigration(const ADescription, AScript: String): IZLConnection;
     function MigrationsHasBeenPerformed: IZLQry;
     function RunPendingMigrations: IZLConnection;
+    function CreateSeederTableIfNotExists: IZLConnection;
+    function AddSeeder(const ADescription, AScript: String): IZLConnection;
+    function SeedersHasBeenPerformed: IZLQry;
+    function RunPendingSeeders: IZLConnection;
   end;
 
 implementation
