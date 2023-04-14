@@ -411,6 +411,7 @@ end;
 
 function TZLMemTableFireDAC.ToJSONObjectString(const AOnlyUpdatedRecords, AChildRecords, AValueRecords, AEncodeBase64Blob: Boolean): string;
 begin
+  TDataSetSerializeConfig.GetInstance.CaseNameDefinition := TCaseNameDefinition.cndLower;
   Result := FMemTable.ToJSONObjectString(AOnlyUpdatedRecords, AChildRecords, AValueRecords, AEncodeBase64Blob);
 end;
 
