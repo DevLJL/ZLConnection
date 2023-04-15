@@ -9,9 +9,9 @@ type
   IZLMemTable = interface
     ['{A33A8267-08DE-482A-B9B4-984E3F6A81A4}']
 
-    function FromJsonString(AJsonString: String): IZLMemTable;
+    function FromJson(AJsonString: String): IZLMemTable;
     function FromDataSet(ADataSet: TDataSet): IZLMemTable;
-    function ToJSONObjectString(const AOnlyUpdatedRecords: Boolean = False; const AChildRecords: Boolean = True; const AValueRecords: Boolean = True; const AEncodeBase64Blob: Boolean = True): string;
+    function ToJson(const AOnlyUpdatedRecords: Boolean = False; const AChildRecords: Boolean = True; const AValueRecords: Boolean = True; const AEncodeBase64Blob: Boolean = True): string;
     function DataSet: TDataSet;
     function FieldDefs: TFieldDefs;
     function CreateDataSet: IZLMemTable;

@@ -16,9 +16,9 @@ type
     destructor Destroy; override;
     class function Make: IZLMemTable;
 
-    function FromJsonString(AJsonString: String): IZLMemTable;
+    function FromJson(AJsonString: String): IZLMemTable;
     function FromDataSet(ADataSet: TDataSet): IZLMemTable;
-    function ToJSONObjectString(const AOnlyUpdatedRecords: Boolean = False; const AChildRecords: Boolean = True; const AValueRecords: Boolean = True; const AEncodeBase64Blob: Boolean = True): string;
+    function ToJson(const AOnlyUpdatedRecords: Boolean = False; const AChildRecords: Boolean = True; const AValueRecords: Boolean = True; const AEncodeBase64Blob: Boolean = True): string;
     function DataSet: TDataSet;
     function FieldDefs: TFieldDefs;
     function CreateDataSet: IZLMemTable;
@@ -342,7 +342,7 @@ begin
   End;
 end;
 
-function TZLMemTableFireDAC.FromJsonString(AJsonString: String): IZLMemTable;
+function TZLMemTableFireDAC.FromJson(AJsonString: String): IZLMemTable;
 begin
   Result := Self;
 
@@ -409,7 +409,7 @@ begin
   Result := FMemTable.State;
 end;
 
-function TZLMemTableFireDAC.ToJSONObjectString(const AOnlyUpdatedRecords, AChildRecords, AValueRecords, AEncodeBase64Blob: Boolean): string;
+function TZLMemTableFireDAC.ToJson(const AOnlyUpdatedRecords, AChildRecords, AValueRecords, AEncodeBase64Blob: Boolean): string;
 begin
   TDataSetSerializeConfig.GetInstance.CaseNameDefinition := TCaseNameDefinition.cndLower;
   Result := FMemTable.ToJSONObjectString(AOnlyUpdatedRecords, AChildRecords, AValueRecords, AEncodeBase64Blob);
