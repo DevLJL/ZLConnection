@@ -332,8 +332,8 @@ begin
     end;
 
     // Nenhum campo é readonly
-    for lI := 0 to Pred(ADataSet.Fields.Count) do
-      ADataSet.Fields[lI].ReadOnly := False;
+    for lI := 0 to Pred(FMemTable.Fields.Count) do
+      FMemTable.Fields[lI].ReadOnly := False;
   Finally
     FMemTable.EnableControls;
     lCloneSource.EnableControls;
