@@ -53,6 +53,7 @@ type
     function CloneCursor(ASource: TDataSet; AReset: Boolean = False; AKeepSettings: Boolean = False): IZLMemTable;
     function FindField(AValue: String): TField;
     function FieldCount: Integer;
+    function UnsignFieldEvents: IZLMemTable;
   end;
 
 implementation
@@ -413,6 +414,20 @@ function TZLMemTableFireDAC.ToJson(const AOnlyUpdatedRecords, AChildRecords, AVa
 begin
   TDataSetSerializeConfig.GetInstance.CaseNameDefinition := TCaseNameDefinition.cndLower;
   Result := FMemTable.ToJSONObjectString(AOnlyUpdatedRecords, AChildRecords, AValueRecords, AEncodeBase64Blob);
+end;
+
+function TZLMemTableFireDAC.UnsignFieldEvents: IZLMemTable;
+var
+  lField: TField;
+begin
+  Result := Self;
+  for lField in FMemTable.Fields do
+  begin
+    lField.OnChange   := nil;
+    lField.OnGetText  := nil;
+    lField.OnSetText  := nil;
+    lField.OnValidate := nil;
+  end;
 end;
 
 end.
