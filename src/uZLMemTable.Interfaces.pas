@@ -46,7 +46,7 @@ type
     function CloneCursor(ASource: TDataSet; AReset: Boolean = False; AKeepSettings: Boolean = False): IZLMemTable;
     function FindField(AValue: String): TField;
     function FieldCount: Integer;
-    function UnsignFieldEvents: IZLMemTable;
+    function UnsignEvents: IZLMemTable;
   end;
 
 

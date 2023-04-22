@@ -53,7 +53,7 @@ type
     function CloneCursor(ASource: TDataSet; AReset: Boolean = False; AKeepSettings: Boolean = False): IZLMemTable;
     function FindField(AValue: String): TField;
     function FieldCount: Integer;
-    function UnsignFieldEvents: IZLMemTable;
+    function UnsignEvents: IZLMemTable;
   end;
 
 implementation
@@ -114,52 +114,6 @@ begin
   lField.DefaultExpression := AExpression;
   lField.DataSet           := FMemTable;
 end;
-
-//var
-//  lField: TField;
-//  lFieldDef: TFieldDef;
-//  oField: TAggregateField;
-//begin
-//  Result := Self;
-//
-//  // Criar Aggregate
-//  if (AFieldKind = fkAggregate) then
-//  begin
-//    oField := TAggregateField.Create(FMemTable);
-//    oField.FieldName  := AFieldName;
-//    oField.Expression := AExpression;
-//    oField.DataSet    := FMemTable;
-//
-////    With FMemTable.Aggregates.Add do
-////    begin
-////      Expression := AExpression;
-////      Name       := AFieldName;
-////      Active     := True;
-////    end;
-//    Exit;
-//  end;
-//
-//  // Criar CalcFields
-//  case AFieldType of
-//    ftString:   lField := TStringField.Create(FMemTable);
-//    ftSmallint: lField := TSmallintField.Create(FMemTable);
-//    ftInteger:  lField := TIntegerField.Create(FMemTable);
-//    ftBoolean:  lField := TBooleanField.Create(FMemTable);
-//    ftFloat:    lField := TFloatField.Create(FMemTable);
-//    ftCurrency: lField := TCurrencyField.Create(FMemTable);
-//    ftDate:     lField := TDateField.Create(FMemTable);
-//    ftDateTime: lField := TDateTimeField.Create(FMemTable);
-//    ftLargeint: lField := TLargeintField.Create(FMemTable);
-//  end;
-//
-//  // Calculados
-//  lField.FieldName    := AFieldName;
-//  lField.DisplayLabel := AFieldName;
-//  lField.Size         := ASize;
-//  lField.Required     := False;
-//  lField.FieldKind    := AFieldKind;
-//  lField.DataSet      := FMemTable;
-//end;
 
 function TZLMemTableFireDAC.AggregatesActive: Boolean;
 begin
@@ -416,11 +370,23 @@ begin
   Result := FMemTable.ToJSONObjectString(AOnlyUpdatedRecords, AChildRecords, AValueRecords, AEncodeBase64Blob);
 end;
 
-function TZLMemTableFireDAC.UnsignFieldEvents: IZLMemTable;
+function TZLMemTableFireDAC.UnsignEvents: IZLMemTable;
 var
   lField: TField;
 begin
   Result := Self;
+
+  FMemTable.AggregatesActive := False;
+  FMemTable.AutoCalcFields   := False;
+  FMemTable.BeforeInsert     := nil;
+  FMemTable.BeforeEdit       := nil;
+  FMemTable.BeforePost       := nil;
+  FMemTable.BeforeDelete     := nil;
+  FMemTable.AfterInsert      := nil;
+  FMemTable.AfterEdit        := nil;
+  FMemTable.AfterPost        := nil;
+  FMemTable.AfterDelete      := nil;
+
   for lField in FMemTable.Fields do
   begin
     lField.OnChange   := nil;
