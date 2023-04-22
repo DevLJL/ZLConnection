@@ -378,16 +378,6 @@ begin
 
   FMemTable.AggregatesActive := False;
   FMemTable.AutoCalcFields   := False;
-<<<<<<< HEAD
-  FMemTable.BeforeInsert     := nil;
-  FMemTable.BeforeEdit       := nil;
-  FMemTable.BeforePost       := nil;
-  FMemTable.BeforeDelete     := nil;
-  FMemTable.AfterInsert      := nil;
-  FMemTable.AfterEdit        := nil;
-  FMemTable.AfterPost        := nil;
-  FMemTable.AfterDelete      := nil;
-=======
   FMemTable.BeforeOpen       := nil;
   FMemTable.BeforeInsert     := nil;
   FMemTable.BeforeEdit       := nil;
@@ -404,7 +394,6 @@ begin
   FMemTable.AfterDelete      := nil;
   FMemTable.AfterScroll      := nil;
   FMemTable.AfterRefresh     := nil;
->>>>>>> 9823994f20b56e2a021564ab555a0793059fb35f
 
   for lField in FMemTable.Fields do
   begin
