@@ -53,7 +53,7 @@ type
     function CloneCursor(ASource: TDataSet; AReset: Boolean = False; AKeepSettings: Boolean = False): IZLMemTable;
     function FindField(AValue: String): TField;
     function FieldCount: Integer;
-    function UnsignFieldEvents: IZLMemTable;
+    function UnsignEvents: IZLMemTable;
   end;
 
 implementation
@@ -416,11 +416,31 @@ begin
   Result := FMemTable.ToJSONObjectString(AOnlyUpdatedRecords, AChildRecords, AValueRecords, AEncodeBase64Blob);
 end;
 
-function TZLMemTableFireDAC.UnsignFieldEvents: IZLMemTable;
+function TZLMemTableFireDAC.UnsignEvents: IZLMemTable;
 var
   lField: TField;
 begin
   Result := Self;
+
+  FMemTable.AggregatesActive := False;
+  FMemTable.AutoCalcFields   := False;
+  FMemTable.BeforeOpen       := nil;
+  FMemTable.BeforeInsert     := nil;
+  FMemTable.BeforeEdit       := nil;
+  FMemTable.BeforePost       := nil;
+  FMemTable.BeforeCancel     := nil;
+  FMemTable.BeforeDelete     := nil;
+  FMemTable.BeforeScroll     := nil;
+  FMemTable.BeforeRefresh    := nil;
+  FMemTable.AfterOpen        := nil;
+  FMemTable.AfterInsert      := nil;
+  FMemTable.AfterEdit        := nil;
+  FMemTable.AfterPost        := nil;
+  FMemTable.AfterCancel      := nil;
+  FMemTable.AfterDelete      := nil;
+  FMemTable.AfterScroll      := nil;
+  FMemTable.AfterRefresh     := nil;
+
   for lField in FMemTable.Fields do
   begin
     lField.OnChange   := nil;
