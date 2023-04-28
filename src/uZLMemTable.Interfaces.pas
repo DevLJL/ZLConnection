@@ -47,6 +47,7 @@ type
     function FindField(AValue: String): TField;
     function FieldCount: Integer;
     function UnsignEvents: IZLMemTable;
+    function Fields: TFields;
   end;
 
 

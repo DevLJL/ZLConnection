@@ -54,6 +54,7 @@ type
     function FindField(AValue: String): TField;
     function FieldCount: Integer;
     function UnsignEvents: IZLMemTable;
+    function Fields: TFields;
   end;
 
 implementation
@@ -234,6 +235,11 @@ end;
 function TZLMemTableFireDAC.FieldDefs: TFieldDefs;
 begin
   Result := FMemTable.FieldDefs;
+end;
+
+function TZLMemTableFireDAC.Fields: TFields;
+begin
+  Result := FMemTable.Fields;
 end;
 
 function TZLMemTableFireDAC.FindField(AValue: String): TField;
