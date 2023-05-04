@@ -7,7 +7,7 @@ uses
 
 type
   IZLQry = Interface
-    ['{DAA2CF91-1A34-4539-8191-5BFE8C9190C9}']
+    ['{C374FAF8-B85B-4E34-8474-33F178F93222}']
 
     function Open(ASQL: String): IZLQry;
     function ExecSQL(ASQL: String): IZLQry;

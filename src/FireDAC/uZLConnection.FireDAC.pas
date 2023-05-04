@@ -12,6 +12,7 @@ uses
   uZLConnection.Interfaces,
   uZLQry.Interfaces,
   uZLScript.Interfaces,
+  uZLMemTable.Interfaces,
   uZLConnection.Types,
   System.Generics.Collections,
   uZLMigration,
@@ -46,6 +47,7 @@ type
     function Disconnect: IZLConnection;
     function MakeQry: IZLQry;
     function MakeScript: IZLScript;
+    function MakeMemTable: IZLMemTable;
     function Instance: TComponent;
     function InTransaction: Boolean;
     function StartTransaction: IZLConnection;
@@ -68,6 +70,7 @@ uses
   System.SysUtils,
   uZLQry.FireDAC,
   uZLScript.FireDAC,
+  uZLMemTable.FireDAC,
   Winapi.Windows;
 
 { TConnection }
@@ -133,14 +136,14 @@ const
                            '   KEY `migration_idx_batch` (`batch`)              '+
                            ' )                                                  ';
 var
-  lQry: IZLQry;
+  LQry: IZLQry;
 begin
   // Criar Migration para o MySQL ###Precisa refatorar###
   if (FDriverDB = TZLDriverDB.ddMySql) then
   begin
-    lQry := MakeQry.Open(Format(SELECT_MIGRATION_MYSQL, [QuotedStr(FDatabase), QuotedStr('migration')]));
-    if (lQry.DataSet.Fields[0].AsInteger <= 0) then
-      lQry.ExecSQL(CREATE_MIGRATION_MYSQL);
+    LQry := MakeQry.Open(Format(SELECT_MIGRATION_MYSQL, [QuotedStr(FDatabase), QuotedStr('migration')]));
+    if (LQry.DataSet.Fields[0].AsInteger <= 0) then
+      LQry.ExecSQL(CREATE_MIGRATION_MYSQL);
   end;
 end;
 
@@ -158,14 +161,14 @@ const
                            '   KEY `seeder_idx_batch` (`batch`)                 '+
                            ' )                                                  ';
 var
-  lQry: IZLQry;
+  LQry: IZLQry;
 begin
   // Criar Seeder para o MySQL ###Precisa refatorar###
   if (FDriverDB = TZLDriverDB.ddMySql) then
   begin
-    lQry := MakeQry.Open(Format(SELECT_SEEDER_MYSQL, [QuotedStr(FDatabase), QuotedStr('seeder')]));
-    if (lQry.DataSet.Fields[0].AsInteger <= 0) then
-      lQry.ExecSQL(CREATE_SEEDER_MYSQL);
+    LQry := MakeQry.Open(Format(SELECT_SEEDER_MYSQL, [QuotedStr(FDatabase), QuotedStr('seeder')]));
+    if (LQry.DataSet.Fields[0].AsInteger <= 0) then
+      LQry.ExecSQL(CREATE_SEEDER_MYSQL);
   end;
 end;
 
@@ -215,6 +218,11 @@ begin
   Result := Self.Create(ADatabase, AServer, AUserName, APassword, ADriverID, AVendorLib);
 end;
 
+function TZLConnectionFireDAC.MakeMemTable: IZLMemTable;
+begin
+  Result := TZLMemTableFireDAC.Make;
+end;
+
 function TZLConnectionFireDAC.MakeQry: IZLQry;
 begin
   Result := TZLQryFireDAC.Make(FConn);
@@ -256,7 +264,7 @@ const
                        ' VALUES                                        '+
                        '   (%s, %s, %s, %s)                            ';
 var
-  lPendingMigrationsQry, lQryMigration: IZLQry;
+  lPendingMigrationsQry, LQryMigration: IZLQry;
   lScript: IZLScript;
   lMigration: TZLMigration;
   lStartTime: Cardinal;
@@ -267,7 +275,7 @@ begin
 
   CreateMigrationTableIfNotExists;
   lPendingMigrationsQry := Self.MigrationsHasBeenPerformed;
-  lQryMigration         := Self.MakeQry;
+  LQryMigration         := Self.MakeQry;
   lScript               := Self.MakeScript;
   lBatch                := Self.NextUUID;
 
@@ -288,7 +296,7 @@ begin
 
       // Registrar Migration
       lDuration := (GetTickCount - lStartTime)/1000;
-      lQryMigration.ExecSQL(Format(L_INSERT_MIGRATION, [
+      LQryMigration.ExecSQL(Format(L_INSERT_MIGRATION, [
         QuotedStr(lMigration.Description),
         QuotedStr(StringReplace(FormatFloat('0.0000', lDuration), FormatSettings.DecimalSeparator, '.', [rfReplaceAll,rfIgnoreCase])),
         QuotedStr(lBatch),
@@ -311,7 +319,7 @@ const
                        ' VALUES                                        '+
                        '   (%s, %s, %s, %s)                            ';
 var
-  lPendingSeedersQry, lQrySeeder: IZLQry;
+  lPendingSeedersQry, LQrySeeder: IZLQry;
   lScript: IZLScript;
   lSeeder: TZLSeeder;
   lStartTime: Cardinal;
@@ -322,7 +330,7 @@ begin
 
   CreateSeederTableIfNotExists;
   lPendingSeedersQry    := Self.SeedersHasBeenPerformed;
-  lQrySeeder            := Self.MakeQry;
+  LQrySeeder            := Self.MakeQry;
   lScript               := Self.MakeScript;
   lBatch                := Self.NextUUID;
 
@@ -343,7 +351,7 @@ begin
 
       // Registrar Seeder
       lDuration := (GetTickCount - lStartTime)/1000;
-      lQrySeeder.ExecSQL(Format(L_INSERT_SEEDER, [
+      LQrySeeder.ExecSQL(Format(L_INSERT_SEEDER, [
         QuotedStr(lSeeder.Description),
         QuotedStr(StringReplace(FormatFloat('0.0000', lDuration), FormatSettings.DecimalSeparator, '.', [rfReplaceAll,rfIgnoreCase])),
         QuotedStr(lBatch),

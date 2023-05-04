@@ -19,6 +19,7 @@ type
     function FromJson(AJsonString: String): IZLMemTable;
     function FromDataSet(ADataSet: TDataSet): IZLMemTable;
     function ToJson(const AOnlyUpdatedRecords: Boolean = False; const AChildRecords: Boolean = True; const AValueRecords: Boolean = True; const AEncodeBase64Blob: Boolean = True): string;
+    function ToJsonArray(const AOnlyUpdatedRecords: Boolean = False; const AChildRecords: Boolean = True; const AValueRecords: Boolean = True; const AEncodeBase64Blob: Boolean = True): string;
     function DataSet: TDataSet;
     function FieldDefs: TFieldDefs;
     function CreateDataSet: IZLMemTable;
@@ -164,6 +165,7 @@ end;
 constructor TZLMemTableFireDAC.Create;
 begin
   inherited Create;
+  TDataSetSerializeConfig.GetInstance.CaseNameDefinition := TCaseNameDefinition.cndLower;
   FMemTable := TFDMemTable.Create(nil);
   FMemTable.Fields.Clear;
 end;
@@ -306,8 +308,6 @@ end;
 function TZLMemTableFireDAC.FromJson(AJsonString: String): IZLMemTable;
 begin
   Result := Self;
-
-  TDataSetSerializeConfig.GetInstance.CaseNameDefinition := TCaseNameDefinition.cndLower;
   FMemTable.LoadFromJSON(AJsonString);
 end;
 
@@ -372,8 +372,12 @@ end;
 
 function TZLMemTableFireDAC.ToJson(const AOnlyUpdatedRecords, AChildRecords, AValueRecords, AEncodeBase64Blob: Boolean): string;
 begin
-  TDataSetSerializeConfig.GetInstance.CaseNameDefinition := TCaseNameDefinition.cndLower;
   Result := FMemTable.ToJSONObjectString(AOnlyUpdatedRecords, AChildRecords, AValueRecords, AEncodeBase64Blob);
+end;
+
+function TZLMemTableFireDAC.ToJsonArray(const AOnlyUpdatedRecords, AChildRecords, AValueRecords, AEncodeBase64Blob: Boolean): string;
+begin
+  Result := FMemTable.ToJSONArrayString(AOnlyUpdatedRecords, AChildRecords, AValueRecords, AEncodeBase64Blob);
 end;
 
 function TZLMemTableFireDAC.UnsignEvents: IZLMemTable;

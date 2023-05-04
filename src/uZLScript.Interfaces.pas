@@ -4,7 +4,7 @@ interface
 
 type
   IZLScript = interface
-    ['{801CA8B3-2077-4635-A8A1-E34696612AEE}']
+    ['{C567853B-7C44-41AC-BBEC-919AC4DA6FF5}']
 
     function SQLScriptsClear: IZLScript;
     function SQLScriptsAdd(AValue: String): IZLScript;

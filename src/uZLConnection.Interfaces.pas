@@ -6,11 +6,12 @@ uses
   System.Classes,
   uZLQry.Interfaces,
   uZLScript.Interfaces,
+  uZLMemTable.Interfaces,
   uZLConnection.Types;
 
 type
   IZLConnection = interface
-    ['{264DE292-C1C2-471D-93C7-81C2582F29CE}']
+    ['{1104BA52-D8CC-40ED-88DD-F41FE5074839}']
 
     function ConnectionType: TZLConnLibType;
     function DriverDB: TZLDriverDB;
@@ -20,6 +21,7 @@ type
     function Disconnect: IZLConnection;
     function MakeQry: IZLQry;
     function MakeScript: IZLScript;
+    function MakeMemTable: IZLMemTable;
     function Instance: TComponent;
     function InTransaction: Boolean;
     function StartTransaction: IZLConnection;
