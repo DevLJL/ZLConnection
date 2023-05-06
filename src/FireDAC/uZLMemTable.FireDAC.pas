@@ -5,7 +5,11 @@ interface
 uses
   uZLMemTable.Interfaces,
   Data.DB,
-  FireDAC.Comp.Client;
+  FireDAC.Comp.Client,
+  FireDAC.UI.Intf,
+  FireDAC.VCLUI.Wait,
+  FireDAC.Stan.Intf,
+  FireDAC.Comp.UI;
 
 type
   TZLMemTableFireDAC = class(TInterfacedObject, IZLMemTable)
