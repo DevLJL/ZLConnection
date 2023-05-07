@@ -169,12 +169,6 @@ end;
 constructor TZLMemTableFireDAC.Create;
 begin
   inherited Create;
-  // Configuração DataSetSerialize
-  TDataSetSerializeConfig.GetInstance.CaseNameDefinition    := TCaseNameDefinition.cndLower;
-  TDataSetSerializeConfig.GetInstance.DateTimeIsISO8601     := False;
-  TDataSetSerializeConfig.GetInstance.Export.FormatDateTime := 'yyyy-mm-dd"T"hh":"mm":"ss.000';
-  TDataSetSerializeConfig.GetInstance.Export.FormatDate     := 'yyyy-mm-dd';
-
   FMemTable := TFDMemTable.Create(nil);
   FMemTable.Fields.Clear;
 end;
