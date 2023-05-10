@@ -311,6 +311,7 @@ end;
 function TZLMemTableFireDAC.FromJson(AJsonString: String): IZLMemTable;
 begin
   Result := Self;
+  FMemTable.EmptyDataSet;
   FMemTable.LoadFromJSON(AJsonString);
 end;
 
