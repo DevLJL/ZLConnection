@@ -279,6 +279,7 @@ begin
     lCloneSource := TFDMemTable.Create(nil);
     lCloneSource.CloneCursor(TFDMemTable(ADataSet), true);
 
+    UnsignEvents;
     FMemTable.DisableControls;
     lCloneSource.DisableControls;
 
@@ -311,6 +312,7 @@ end;
 function TZLMemTableFireDAC.FromJson(AJsonString: String): IZLMemTable;
 begin
   Result := Self;
+  UnsignEvents;
   FMemTable.EmptyDataSet;
   FMemTable.LoadFromJSON(AJsonString);
 end;
