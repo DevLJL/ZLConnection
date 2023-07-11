@@ -10,6 +10,7 @@ type
     ['{C374FAF8-B85B-4E34-8474-33F178F93222}']
 
     function Open(ASQL: String): IZLQry;
+    function AOpen(ASQL: String): IZLQry;
     function ExecSQL(ASQL: String): IZLQry;
     function DataSet: TDataSet;
     function Close: IZLQry;

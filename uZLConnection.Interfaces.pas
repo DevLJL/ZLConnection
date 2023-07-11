@@ -7,7 +7,10 @@ uses
   uZLQry.Interfaces,
   uZLScript.Interfaces,
   uZLMemTable.Interfaces,
-  uZLConnection.Types;
+  uZLConnection.Types,
+  uZLMigration,
+  uZLSeeder,
+  System.Generics.Collections;
 
 type
   IZLConnection = interface
@@ -31,10 +34,12 @@ type
     function AddMigration(const ADescription, AScript: String): IZLConnection;
     function MigrationsHasBeenPerformed: IZLQry;
     function RunPendingMigrations: IZLConnection;
+    function Migrations: TObjectList<TZLMigration>;
     function CreateSeederTableIfNotExists: IZLConnection;
     function AddSeeder(const ADescription, AScript: String): IZLConnection;
     function SeedersHasBeenPerformed: IZLQry;
     function RunPendingSeeders: IZLConnection;
+    function Seeders: TObjectList<TZLSeeder>;
   end;
 
 implementation

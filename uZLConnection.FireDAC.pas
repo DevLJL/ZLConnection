@@ -57,11 +57,13 @@ type
     function AddMigration(const ADescription, AScript: String): IZLConnection;
     function MigrationsHasBeenPerformed: IZLQry;
     function RunPendingMigrations: IZLConnection;
+    function Migrations: TObjectList<TZLMigration>;
     function NextUUID: String;
     function CreateSeederTableIfNotExists: IZLConnection;
     function AddSeeder(const ADescription, AScript: String): IZLConnection;
     function SeedersHasBeenPerformed: IZLQry;
     function RunPendingSeeders: IZLConnection;
+    function Seeders: TObjectList<TZLSeeder>;
   end;
 
 implementation
@@ -233,6 +235,11 @@ begin
   Result := TZLScriptFireDAC.Make(FConn);
 end;
 
+function TZLConnectionFireDAC.Migrations: TObjectList<TZLMigration>;
+begin
+  Result := FMigrations;
+end;
+
 function TZLConnectionFireDAC.MigrationsHasBeenPerformed: IZLQry;
 const
   MIGRATION_ORDER_BY_DESCRIPTION = 'select * from migration order by id';
@@ -365,6 +372,11 @@ begin
       raise;
     end;
   end;
+end;
+
+function TZLConnectionFireDAC.Seeders: TObjectList<TZLSeeder>;
+begin
+  Result := FSeeders;
 end;
 
 function TZLConnectionFireDAC.SeedersHasBeenPerformed: IZLQry;

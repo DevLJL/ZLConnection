@@ -134,8 +134,9 @@ function TZLQryFireDAC.Open(ASQL: String): IZLQry;
 begin
   Result := Self;
 
-  if FQry.Active then
-    FQry.Close;
+  if FQry.Active                  then FQry.Close;
+  if FQry.Filtered                then FQry.Filtered := False;
+  if not FQry.Filter.Trim.IsEmpty then FQry.Filter   := EmptyStr;
 
   FQry.Open(ASQL);
 end;
