@@ -46,6 +46,8 @@ type
     function Connect: IZLConnection;
     function Disconnect: IZLConnection;
     function MakeQry: IZLQry;
+    function OpenQry(ASQL: String): IZLQry;
+    function ExecSQLQry(ASQL: String): IZLQry;
     function MakeScript: IZLScript;
     function MakeMemTable: IZLMemTable;
     function Instance: TComponent;
@@ -200,6 +202,11 @@ begin
   Result := FDriverDB;
 end;
 
+function TZLConnectionFireDAC.ExecSQLQry(ASQL: String): IZLQry;
+begin
+  Result := MakeQry.ExecSQL(ASQL);
+end;
+
 function TZLConnectionFireDAC.Instance: TComponent;
 begin
   Result := FConn;
@@ -256,6 +263,11 @@ begin
   Result := TGUID.NewGuid.ToString;
   for lI := 0 to High(L_CHARS_TO_REMOVE) do
     Result := StringReplace(Result, L_CHARS_TO_REMOVE[lI], '', [rfReplaceAll]);
+end;
+
+function TZLConnectionFireDAC.OpenQry(ASQL: String): IZLQry;
+begin
+  Result := MakeQry.Open(ASQL);
 end;
 
 function TZLConnectionFireDAC.RollBackTransaction: IZLConnection;

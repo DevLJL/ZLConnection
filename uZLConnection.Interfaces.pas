@@ -23,6 +23,8 @@ type
     function Connect: IZLConnection;
     function Disconnect: IZLConnection;
     function MakeQry: IZLQry;
+    function OpenQry(ASQL: String): IZLQry;
+    function ExecSQLQry(ASQL: String): IZLQry;
     function MakeScript: IZLScript;
     function MakeMemTable: IZLMemTable;
     function Instance: TComponent;
