@@ -4,6 +4,7 @@ interface
 
 uses
   uZLQry.Interfaces,
+  uZLMemTable.Interfaces,
   FireDAC.Comp.Client,
   Data.DB;
 
@@ -31,12 +32,14 @@ type
     function Filtered(AValue: Boolean): IZLQry overload;
     function Filtered: Boolean; overload;
     function RecordCount: Integer;
+    function ToMemTable: IZLMemTable;
   end;
 
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils,
+  uZLMemTable.FireDAC;
 
 { TZLQryFireDAC }
 
@@ -144,6 +147,11 @@ end;
 function TZLQryFireDAC.RecordCount: Integer;
 begin
   Result := FQry.RecordCount;
+end;
+
+function TZLQryFireDAC.ToMemTable: IZLMemTable;
+begin
+  Result := TZLMemTableFireDAC.Make.FromDataSet(FQry);
 end;
 
 end.

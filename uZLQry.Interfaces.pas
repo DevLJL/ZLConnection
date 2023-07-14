@@ -3,7 +3,8 @@ unit uZLQry.Interfaces;
 interface
 
 uses
-  Data.DB;
+  Data.DB,
+  uZLMemTable.Interfaces;
 
 type
   IZLQry = Interface
@@ -23,6 +24,7 @@ type
     function Filtered(AValue: Boolean): IZLQry overload;
     function Filtered: Boolean; overload;
     function RecordCount: Integer;
+    function ToMemTable: IZLMemTable;
   end;
 
 implementation
